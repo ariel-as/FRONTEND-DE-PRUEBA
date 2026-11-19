@@ -1,0 +1,26 @@
+﻿name: Empaquetar frontend
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  empaquetar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener el repositorio
+        uses: actions/checkout@v4
+      - name: Preparar frontend
+        run: |
+          mkdir dist
+          cp -r admin assets cliente controllers models views index.html dist/
+      - name: Subir artefacto del frontend
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend
+          path: dist/
+          if-no-files-found: error
