@@ -62,23 +62,37 @@ jobs:
         with:
           category: '/language:javascript'
 
-  empaquetar:
-    name: Empaquetar frontend
+  publicar:
+    name: Publicar en GitHub Pages
     needs: [validar, seguridad]
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     steps:
       - name: Obtener el repositorio
         uses: actions/checkout@v6
-      - name: Preparar el paquete
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Preparar el sitio
         run: |
           mkdir dist
           cp -r admin assets cliente controllers models views index.html dist/
-      - name: Subir artefacto
-        uses: actions/upload-artifact@v6
+          test -s dist/index.html
+          echo "Archivos preparados: $(find dist -type f | wc -l)"
+      - name: Subir artefacto de Pages
+        uses: actions/upload-pages-artifact@v4
         with:
-          name: frontend-${{ github.sha }}
-          path: dist/
-          if-no-files-found: error
-          retention-days: 14
+          path: dist
+      - name: Desplegar sitio
+        id: deploy
+        uses: actions/deploy-pages@v4
