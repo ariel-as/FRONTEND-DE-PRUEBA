@@ -1,4 +1,4 @@
-﻿name: CI/CD frontend
+name: CI/CD frontend
 
 on:
   pull_request:
@@ -76,7 +76,7 @@ jobs:
           mkdir dist
           cp -r admin assets cliente controllers models views index.html dist/
       - name: Subir artefacto
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: frontend-${{ github.sha }}
           path: dist/
