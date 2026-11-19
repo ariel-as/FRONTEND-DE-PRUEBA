@@ -5,6 +5,8 @@ on:
     branches: [main]
   push:
     branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'
   workflow_dispatch:
 
 permissions:
@@ -17,9 +19,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Obtener el repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Preparar Node.js 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22.x'
       - name: Verificar versión del runtime
@@ -32,24 +34,51 @@ jobs:
       - name: Revisar estructura, rutas y versiones de dependencias
         run: node scripts/ci-check.mjs
 
+  seguridad:
+    name: Análisis de seguridad
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: read
+      security-events: write
+    steps:
+      - name: Obtener el repositorio y su historial
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Detectar secretos en el código y el historial
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: 'false'
+      - name: Inicializar CodeQL para JavaScript
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+      - name: Analizar vulnerabilidades del código
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: '/language:javascript'
+
   empaquetar:
     name: Empaquetar frontend
-    needs: validar
-    if: github.event_name != 'pull_request'
+    needs: [validar, seguridad]
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Obtener el repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Preparar el paquete
         run: |
           mkdir dist
           cp -r admin assets cliente controllers models views index.html dist/
       - name: Subir artefacto
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: frontend-${{ github.sha }}
           path: dist/
           if-no-files-found: error
           retention-days: 14
-
