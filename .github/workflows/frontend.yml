@@ -1,6 +1,8 @@
-﻿name: Empaquetar frontend
+﻿name: CI/CD frontend
 
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [main]
   workflow_dispatch:
@@ -9,18 +11,45 @@ permissions:
   contents: read
 
 jobs:
-  empaquetar:
+  validar:
+    name: Validar frontend
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Obtener el repositorio
         uses: actions/checkout@v4
-      - name: Preparar frontend
+      - name: Preparar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+      - name: Verificar versión del runtime
+        run: node -e "if (process.versions.node.split('.')[0] !== '22') process.exit(1); console.log('Node.js ' + process.versions.node)"
+      - name: Revisar sintaxis JavaScript
+        run: |
+          while IFS= read -r archivo; do
+            node --check "$archivo"
+          done < <(find . -type f \( -name '*.js' -o -name '*.mjs' \) -not -path './.git/*' | sort)
+      - name: Revisar estructura, rutas y versiones de dependencias
+        run: node scripts/ci-check.mjs
+
+  empaquetar:
+    name: Empaquetar frontend
+    needs: validar
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Obtener el repositorio
+        uses: actions/checkout@v4
+      - name: Preparar el paquete
         run: |
           mkdir dist
           cp -r admin assets cliente controllers models views index.html dist/
-      - name: Subir artefacto del frontend
+      - name: Subir artefacto
         uses: actions/upload-artifact@v4
         with:
-          name: frontend
+          name: frontend-${{ github.sha }}
           path: dist/
           if-no-files-found: error
+          retention-days: 14
+
