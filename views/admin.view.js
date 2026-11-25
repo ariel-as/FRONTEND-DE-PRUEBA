@@ -5,6 +5,7 @@ export function navAdmin(activa = '') {
     ['index.html','Dashboard','dashboard'],
     ['productos.html','Productos','productos'],
     ['pedidos.html','Pedidos','pedidos'],
+    ['facturas.html','Facturas','facturas'],
     ['clientes.html','Clientes','clientes'],
     ['membresias.html','Membresías','membresias'],
     ['inscripciones.html','Inscripciones','inscripciones'],

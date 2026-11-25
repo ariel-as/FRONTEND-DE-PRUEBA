@@ -32,5 +32,13 @@ export const adminModel = {
   kardex: (productoId) => api.get(`/admin/inventario/kardex/${encodeURIComponent(productoId)}`, { requiereSesion: true }),
   bajaLote: (loteId, observacion) => api.post(`/admin/inventario/lotes/${loteId}/baja`, { observacion }, { requiereSesion: true }),
   bloquearLote: (loteId, bloquear) => api.patch(`/admin/inventario/lotes/${loteId}/bloqueo`, { bloquear }, { requiereSesion: true }),
-  reporteInventario: (params = {}) => api.get(`/admin/reportes/inventario${q(params)}`, { requiereSesion: true })
+  reporteInventario: (params = {}) => api.get(`/admin/reportes/inventario${q(params)}`, { requiereSesion: true }),
+
+  facturas: (params = {}) => api.get(`/admin/facturas${q(params)}`, { requiereSesion: true }),
+
+  facturasPendientes: (params = {}) => api.get(`/admin/facturas/pendientes${q(params)}`, { requiereSesion: true }),
+
+  generarFactura: (body) => api.post('/admin/facturas', body, { requiereSesion: true }),
+
+  actualizarSri: (id, body) => api.patch(`/admin/facturas/${encodeURIComponent(id)}/sri`, body, { requiereSesion: true })
 };
