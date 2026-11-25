@@ -5,6 +5,7 @@ import { iniciarAuth } from './auth.controller.js';
 import { iniciarCheckout } from './checkout.controller.js';
 import { iniciarNutricion } from './nutricion.controller.js';
 import { iniciarMisPedidos } from './pedidos.controller.js';
+import { iniciarMiCuenta, iniciarMiRutina } from './cuenta.controller.js';
 import { mostrarAviso } from '../views/componentes.view.js';
 import { raizSitio } from '../models/storage.model.js';
 
@@ -15,9 +16,9 @@ if (location.hash) document.documentElement.classList.add('pf-posicion-pendiente
 window.addEventListener('pf:sesion-expirada', () => {
   mostrarAviso('Tu sesión terminó. Inicia sesión de nuevo; tu carrito se conserva.', 'error');
   const pagina = document.body.dataset.pagina;
-  if (pagina === 'checkout' || pagina === 'mis-pedidos') {
+  if (['checkout', 'mis-pedidos', 'mi-cuenta', 'mi-rutina'].includes(pagina)) {
     window.setTimeout(() => {
-      const origen = pagina === 'checkout' ? 'carrito' : 'mis-pedidos';
+      const origen = { checkout: 'carrito', 'mis-pedidos': 'mis-pedidos', 'mi-cuenta': 'mi-cuenta', 'mi-rutina': 'mi-rutina' }[pagina];
       location.href = new URL(`cliente/login.html?origen=${origen}`, raizSitio()).href;
     }, 800);
   }
@@ -34,6 +35,8 @@ async function main(){
       case 'checkout': await iniciarCheckout(); break;
       case 'nutricion': await iniciarNutricion(); break;
       case 'mis-pedidos': await iniciarMisPedidos(); break;
+      case 'mi-cuenta': await iniciarMiCuenta(); break;
+      case 'mi-rutina': await iniciarMiRutina(); break;
       default: break;
     }
   } catch (e){

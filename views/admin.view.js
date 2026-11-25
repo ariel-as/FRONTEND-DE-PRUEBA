@@ -10,6 +10,7 @@ export function navAdmin(activa = '') {
     ['membresias.html','Membresías','membresias'],
     ['inscripciones.html','Inscripciones','inscripciones'],
     ['clases.html','Clases','clases'],
+    ['rutinas.html','Rutinas','rutinas'],
     ['personal.html','Personal','personal'],
     ['usuarios.html','Usuarios','usuarios'],
     ['tablas.html','Otras tablas','tablas']
