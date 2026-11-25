@@ -312,3 +312,5 @@ export async function iniciarRutinas() {
 
   seleccionar('#rutina-grupo')?.addEventListener('change', actualizarEjercicios);
 }
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciarRutinas); else iniciarRutinas();

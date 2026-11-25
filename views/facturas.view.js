@@ -28,7 +28,7 @@ export function filaFactura(f) {
     <td class="font-monospace">${escapar(f.numComprobante || 'Sin número')}</td>
     <td class="text-end">${formatearPrecio(f.total ?? 0)}</td>
     <td><span class="badge text-bg-secondary" data-estado-factura>${escapar(nombre)}</span>${f.simulado ? `<span class="d-block small text-body-secondary">Simulado · ${escapar(f.ambiente || 'Pruebas')}</span>` : ''}</td>
-    <td><button type="button" class="btn btn-sm btn-outline-primary" data-editar-sri data-id="${f.id}" data-numero="${escapar(f.numComprobante || '')}" data-clave="${escapar(f.claveAcceso || '')}" ${f.estado === 'A' ? 'disabled' : ''} aria-label="Corregir número y clave SRI de la factura ${f.id}">Corregir SRI</button></td>
+    <td><button type="button" class="btn btn-sm btn-outline-primary" data-editar-sri data-id="${f.id}" data-numero="${escapar(f.numComprobante || '')}" data-clave="${escapar(f.claveAcceso || '')}" ${f.estado === 'A' ? 'disabled' : ''} aria-label="Corregir SRI de la factura ${f.id}">Corregir SRI</button></td>
   </tr>`;
 }
 

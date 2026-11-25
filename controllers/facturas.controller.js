@@ -148,3 +148,5 @@ export async function iniciarFacturas() {
   seleccionar('#sri-cancelar')?.addEventListener('click', () => seleccionar('#dialogo-sri').close());
   seleccionar('#sri-guardar')?.addEventListener('click', guardarSri);
 }
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciarFacturas); else iniciarFacturas();

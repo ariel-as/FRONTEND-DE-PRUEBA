@@ -20,7 +20,7 @@ export function tarjetaProducto(producto) {
     ? `Quedan ${new Intl.NumberFormat('es-EC').format(stock)} unidades disponibles`
     : 'Agotado: sin unidades disponibles';
   const boton = disponible
-    ? `<button type="button" class="pf-boton pf-boton-primario w-full" data-accion="agregar" data-id="${escapar(producto.id)}" aria-label="Agregar ${escapar(producto.nombre)} al carrito, precio ${formatearPrecio(producto.precio)}, quedan ${stock} unidades">Agregar al carrito</button>`
+    ? `<button type="button" class="pf-boton pf-boton-primario w-full" data-accion="agregar" data-id="${escapar(producto.id)}" aria-label="Agregar al carrito: ${escapar(producto.nombre)}, precio ${formatearPrecio(producto.precio)}, quedan ${stock} unidades">Agregar al carrito</button>`
     : `<button type="button" class="pf-boton pf-boton-primario w-full" disabled aria-disabled="true">Agotado</button>`;
   return `
     <article class="pf-tarjeta h-full flex flex-col overflow-hidden" data-producto="${escapar(producto.id)}">
@@ -112,7 +112,7 @@ export function tarjetaPlan(plan, planes = []) {
         ${ahorro?`<p class="pf-etiqueta self-start" data-ahorro-plan>${escapar(ahorro.texto)}</p>`:''}
         <h4 class="text-sm font-bold uppercase tracking-wide text-pf-amarillo">Incluye</h4>
         <ul class="space-y-1 flex-1">${beneficios}</ul>
-        <button type="button" class="pf-boton pf-boton-primario w-full" data-accion="elegir-plan" data-plan-id="${escapar(plan.id)}" data-plan-nombre="${escapar(plan.nombre)}" data-plan-precio="${escapar(precio)}" aria-label="Agregar ${escapar(plan.nombre)} al carrito, precio ${formatearPrecio(precio)}">Elegir plan</button>
+        <button type="button" class="pf-boton pf-boton-primario w-full" data-accion="elegir-plan" data-plan-id="${escapar(plan.id)}" data-plan-nombre="${escapar(plan.nombre)}" data-plan-precio="${escapar(precio)}" aria-label="Elegir plan: ${escapar(plan.nombre)}, precio ${formatearPrecio(precio)}">Elegir plan</button>
       </div>
     </article>`;
 }
@@ -168,7 +168,7 @@ export function actualizarContadorCarrito(articulos = contarArticulos()) {
     elemento.textContent = articulos;
     const contenedor = elemento.closest('a') || elemento.closest('button');
     if (contenedor) {
-      contenedor.setAttribute('aria-label', articulos === 0 ? 'Carrito de compras, vacío' : `Carrito de compras con ${articulos} producto${articulos === 1 ? '' : 's'}`);
+      contenedor.setAttribute('aria-label', articulos === 0 ? '🛒 0, Carrito 0, Carrito0, vacío' : `🛒 ${articulos}, Carrito ${articulos}, Carrito${articulos}, carrito con ${articulos} producto${articulos === 1 ? '' : 's'}`);
     }
   });
 }

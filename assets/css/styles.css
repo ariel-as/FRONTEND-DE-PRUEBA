@@ -1597,13 +1597,14 @@ html[data-tema="claro"] .pf-tarjeta h4.text-pf-amarillo {
   padding: 0.45rem 0.75rem !important;
   border-radius: 999px;
   color: rgba(255, 255, 255, 0.78) !important;
+  background-color: rgba(15, 18, 22, 0.94);
   transition: background-color var(--pf-transicion), color var(--pf-transicion);
 }
 
 .pf-admin > header .nav-link:hover,
 .pf-admin > header .nav-link:focus-visible {
   color: #ffffff !important;
-  background-color: rgba(255, 208, 0, 0.14);
+  background-color: #2d3238 !important;
 }
 
 .pf-admin > header .nav-link.active {
@@ -1734,6 +1735,41 @@ html[data-bs-theme="dark"] .pf-admin h1,
 html[data-bs-theme="dark"] .pf-admin h2,
 html[data-bs-theme="dark"] .pf-admin h3 {
   color: #ffffff;
+}
+
+html[data-bs-theme="dark"] .pf-admin .btn-outline-primary {
+  color: #9cc4ff;
+  border-color: #9cc4ff;
+}
+
+html[data-bs-theme="dark"] .pf-admin .btn-outline-secondary {
+  color: #d0d4d8;
+  border-color: #d0d4d8;
+}
+
+html[data-bs-theme="dark"] .pf-admin .btn-outline-danger {
+  color: #ff9ba4;
+  border-color: #ff9ba4;
+}
+
+html[data-bs-theme="dark"] .pf-admin .btn-outline-secondary:hover,
+html[data-bs-theme="dark"] .pf-admin .btn-outline-danger:hover {
+  color: #101418;
+}
+
+html[data-bs-theme="light"] .pf-admin .btn-outline-primary:hover,
+html[data-bs-theme="light"] .pf-admin .btn-outline-primary:focus,
+html[data-bs-theme="light"] .pf-admin .btn-outline-primary:active {
+  color: #0a3d91;
+  background-color: #ffffff;
+}
+
+html[data-bs-theme="dark"] .pf-admin .btn-outline-primary:hover,
+html[data-bs-theme="dark"] .pf-admin .btn-outline-primary:focus,
+html[data-bs-theme="dark"] .pf-admin .btn-outline-primary:active {
+  color: #e6f2ff;
+  background-color: #19427f;
+  border-color: #9cc4ff;
 }
 
 /* ---------- Respeta a quien prefiere reducir el movimiento ---------- */
