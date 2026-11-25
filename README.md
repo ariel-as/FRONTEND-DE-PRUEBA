@@ -10,4 +10,4 @@ Sitio: https://ariel-as.github.io/FRONTEND-DE-PRUEBA/
 
 ## API
 
-La URL base de la API está en `models/config.js`. El valor inicial apunta a `http://localhost:5050/api/v1`; para que las funciones conectadas a la API trabajen desde el sitio publicado, debe configurarse con una API accesible públicamente.
+La URL base de la API está en `models/config.js` y actualmente apunta a `https://planeta-fitness-api.onrender.com/api/v1`, para que las funciones conectadas a la API trabajen desde el sitio publicado. Para desarrollo local puede ajustarse temporalmente a `http://localhost:5050/api/v1`.
