@@ -34,7 +34,10 @@ export function inyectarEstructuraPanel() {
 function controlCantidad(item) {
   const nombre = escapar(item.nombre);
   if (esPlan(item)) return `<span class="pf-cantidad"><output aria-label="Cantidad de ${nombre}">${escapar(item.cantidad)}</output></span>`;
-  return `<span class="pf-cantidad"><button type="button" data-restar="${escapar(item.id)}" aria-label="Disminuir la cantidad de ${nombre}"><span aria-hidden="true">&minus;</span></button><output aria-label="Cantidad de ${nombre}">${escapar(item.cantidad)}</output><button type="button" data-sumar="${escapar(item.id)}" aria-label="Aumentar la cantidad de ${nombre}"><span aria-hidden="true">+</span></button></span>`;
+  const limite = Number(item.stock);
+  const tope = Number.isFinite(limite) && item.cantidad >= limite;
+  const deshabilitado = tope ? ' disabled aria-disabled="true"' : '';
+  return `<span class="pf-cantidad"><button type="button" data-restar="${escapar(item.id)}" aria-label="Disminuir la cantidad de ${nombre}"><span aria-hidden="true">&minus;</span></button><output aria-label="Cantidad de ${nombre}">${escapar(item.cantidad)}</output><button type="button" data-sumar="${escapar(item.id)}" aria-label="Aumentar la cantidad de ${nombre}"${deshabilitado}><span aria-hidden="true">+</span></button></span>`;
 }
 
 export function pintarPanelCarrito() {
@@ -45,7 +48,7 @@ export function pintarPanelCarrito() {
   lista.innerHTML = items.map((item)=>`
       <li class="pf-linea" data-linea-panel="${escapar(item.id)}">
         ${item.imagen ? `<img src="${escapar(rutaArchivo(item.imagen))}" alt="${escapar(item.nombre)}" width="64" height="64">` : `<span class="pf-linea-sin-imagen" aria-hidden="true">${escapar((item.nombre||'?').charAt(0).toUpperCase())}</span>`}
-        <div class="pf-linea-detalle"><p class="m-0 font-bold text-white">${escapar(item.nombre)}</p><p class="m-0 text-sm text-neutral-400">${escapar(esPlan(item)?'Plan mensual':'Producto')} ${formatearPrecio(item.precio)} c/u</p><div class="pf-linea-precios">${controlCantidad(item)}<span class="pf-precio">${formatearPrecio(item.precio*item.cantidad)}</span></div><button type="button" class="pf-quitar" data-quitar="${escapar(item.id)}">Eliminar del carrito</button></div>
+        <div class="pf-linea-detalle"><p class="m-0 font-bold text-white">${escapar(item.nombre)}</p><p class="m-0 text-sm text-neutral-400">${escapar(esPlan(item)?'Plan mensual':'Producto')} ${formatearPrecio(item.precio)} c/u</p>${esPlan(item)?'':`<p class="m-0 text-xs text-neutral-300" data-stock-linea>${Number(item.stock)>0?`Quedan ${escapar(item.stock)} unidades disponibles`:'Sin unidades disponibles'}</p>`}<div class="pf-linea-precios">${controlCantidad(item)}<span class="pf-precio">${formatearPrecio(item.precio*item.cantidad)}</span></div><button type="button" class="pf-quitar" data-quitar="${escapar(item.id)}">Eliminar del carrito</button></div>
       </li>`).join('');
   const etiqueta = document.querySelector('[data-panel-articulos]'); if (etiqueta) etiqueta.textContent = `(${articulos})`;
   const subtotal = carrito.subtotal();

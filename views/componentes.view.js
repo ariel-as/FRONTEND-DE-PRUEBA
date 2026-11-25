@@ -14,9 +14,13 @@ export function rutaArchivo(ruta) {
 }
 
 export function tarjetaProducto(producto) {
-  const disponible = producto.disponible !== false && Number(producto.stock ?? 0) > 0;
+  const stock = Number(producto.stock ?? 0);
+  const disponible = producto.disponible !== false && stock > 0;
+  const etiquetaStock = disponible
+    ? `Quedan ${new Intl.NumberFormat('es-EC').format(stock)} unidades disponibles`
+    : 'Agotado: sin unidades disponibles';
   const boton = disponible
-    ? `<button type="button" class="pf-boton pf-boton-primario w-full" data-accion="agregar" data-id="${escapar(producto.id)}" aria-label="Agregar ${escapar(producto.nombre)} al carrito, precio ${formatearPrecio(producto.precio)}">Agregar al carrito</button>`
+    ? `<button type="button" class="pf-boton pf-boton-primario w-full" data-accion="agregar" data-id="${escapar(producto.id)}" aria-label="Agregar ${escapar(producto.nombre)} al carrito, precio ${formatearPrecio(producto.precio)}, quedan ${stock} unidades">Agregar al carrito</button>`
     : `<button type="button" class="pf-boton pf-boton-primario w-full" disabled aria-disabled="true">Agotado</button>`;
   return `
     <article class="pf-tarjeta h-full flex flex-col overflow-hidden" data-producto="${escapar(producto.id)}">
@@ -28,6 +32,7 @@ export function tarjetaProducto(producto) {
         <div>
           <p class="text-2xl font-extrabold pf-precio">${formatearPrecio(producto.precio)}</p>
           <p class="text-xs text-neutral-400">IVA incluido</p>
+          <p class="text-xs text-neutral-300" data-stock-producto>${escapar(etiquetaStock)}</p>
         </div>
         ${boton}
       </div>

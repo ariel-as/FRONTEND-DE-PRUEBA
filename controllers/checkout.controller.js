@@ -45,7 +45,17 @@ export async function iniciarCheckout(){
       }
     } catch (e){
       if (e.status===401){ window.location.href = new URL('cliente/login.html?origen=checkout', raizSitio()).href; return false; }
-      if (e.status===409){ mostrarMensaje(region, e.mensaje || 'Hay un conflicto con tu pedido. Revisa el carrito.', 'error'); }
+      if (e.status===409){
+        const detalle = (e.detalles || []).find((d) => d.productoId && d.disponible !== undefined);
+        if (detalle) {
+          const disponible = Math.max(0, Number(detalle.disponible) || 0);
+          carrito.fijarStock(String(detalle.productoId), disponible);
+          pintarResumenCheckout(select('[data-checkout-resumen]'), carrito.obtener(), carrito.total());
+          mostrarMensaje(region, `${detalle.nombre || 'Producto'}: solo quedan ${disponible} unidades. Revisa el carrito.`, 'error');
+          return false;
+        }
+        mostrarMensaje(region, e.mensaje || 'Hay un conflicto con tu pedido. Revisa el carrito.', 'error');
+      }
       else mostrarMensaje(region, e.mensaje || 'No se pudo registrar el pedido.', 'error');
       return false;
     } finally { boton.disabled=false; form.removeAttribute('aria-busy'); }

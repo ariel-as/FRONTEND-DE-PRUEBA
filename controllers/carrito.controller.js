@@ -1,4 +1,4 @@
-import { carrito, CANTIDAD_MAXIMA } from '../models/carrito.model.js';
+import { carrito, maximoDe } from '../models/carrito.model.js';
 import { iniciarSesion, haySesion, guardarPendencia } from '../models/sesion.model.js';
 import { construirValidador, mostrarMensaje } from './validacion.controller.js';
 import { mostrarAviso } from '../views/componentes.view.js';
@@ -33,7 +33,7 @@ export function iniciarPanelCarrito(){
   document.querySelector('[data-capa-acceso]')?.addEventListener('click', ()=>cerrarModalAcceso());
   document.querySelector('[data-panel-lineas]')?.addEventListener('click', (evento)=>{
     const sumar = evento.target.closest('[data-sumar]'); const restar = evento.target.closest('[data-restar]'); const quitar = evento.target.closest('[data-quitar]');
-    if (sumar){ const id=sumar.dataset.sumar; const item=carrito.obtener().find(l=>String(l.id)===id); if(item && item.cantidad >= (item.stock ?? CANTIDAD_MAXIMA)) { mostrarAviso('No hay más unidades disponibles.', 'info'); return; } carrito.cambiar(id, (item?.cantidad||0)+1); return; }
+    if (sumar){ const id=sumar.dataset.sumar; const item=carrito.obtener().find(l=>String(l.id)===id); if(item && item.cantidad >= maximoDe(item)) { mostrarAviso(Number(item.stock)<=0?'Ya no hay unidades disponibles de este producto.':'No hay más unidades disponibles de este producto.', 'error'); return; } carrito.cambiar(id, (item?.cantidad||0)+1); return; }
     if (restar){ const id=restar.dataset.restar; const item=carrito.obtener().find(l=>String(l.id)===id); if(!item) return; if(item.cantidad<=1){ carrito.eliminar(id); } else { carrito.cambiar(id, item.cantidad-1); } return; }
     if (quitar){ carrito.eliminar(quitar.dataset.quitar); }
   });

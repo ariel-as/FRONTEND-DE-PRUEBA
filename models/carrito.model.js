@@ -6,7 +6,7 @@ export const CANTIDAD_MAXIMA_PLAN = 1;
 export function esPlan(linea) {
   return linea?.tipo === 'plan';
 }
-function maximoDe(linea) {
+export function maximoDe(linea) {
   const base = esPlan(linea) ? CANTIDAD_MAXIMA_PLAN : CANTIDAD_MAXIMA;
   const stock = Number.isFinite(Number(linea?.stock)) ? Number(linea.stock) : base;
   return Math.max(1, Math.min(base, stock));
@@ -63,6 +63,17 @@ export function cambiarCantidad(id, cantidad) {
   guardarCarrito(carrito);
   return carrito;
 }
+export function fijarStock(id, stock) {
+  const carrito = obtenerCarrito();
+  const item = carrito.find((linea) => String(linea.id) === String(id));
+  if (!item) return carrito;
+  const disponible = Math.max(0, Number(stock) || 0);
+  item.stock = disponible;
+  if (disponible === 0) return eliminarProducto(id);
+  item.cantidad = Math.min(maximoDe(item), item.cantidad);
+  guardarCarrito(carrito);
+  return carrito;
+}
 export function calcularSubtotal(producto, cantidad) {
   return Number(producto.precio) * Number(cantidad);
 }
@@ -82,6 +93,7 @@ export const carrito = {
   agregar(producto, cantidad) { const r = agregarProducto(producto, cantidad); notificarCambio(r); return r; },
   eliminar(id) { const r = eliminarProducto(id); notificarCambio(r); return r; },
   cambiar(id, cantidad) { const r = cambiarCantidad(id, cantidad); notificarCambio(r); return r; },
+  fijarStock(id, stock) { const r = fijarStock(id, stock); notificarCambio(r); return r; },
   vaciar() { const r = vaciarCarrito(); notificarCambio(r); return r; },
   obtener: obtenerCarrito,
   contar: contarArticulos,

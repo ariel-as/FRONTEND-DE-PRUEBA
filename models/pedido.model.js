@@ -8,6 +8,17 @@ export async function confirmarCompra(carritoItems, pago = {}) {
   const errores = [];
   const confirmadas = [];
 
+  const sinStock = productos.find((p) => Number(p.stock) <= 0 || Number(p.cantidad) > Number(p.stock));
+  if (sinStock) {
+    const disponible = Math.max(0, Number(sinStock.stock) || 0);
+    const error = {
+      status: 409,
+      mensaje: `Solo quedan ${disponible} unidades de ${sinStock.nombre || sinStock.id}. Revisa el carrito.`,
+      detalles: [{ campo: 'items', mensaje: 'Stock insuficiente', productoId: String(sinStock.id), nombre: sinStock.nombre, disponible }]
+    };
+    throw error;
+  }
+
   if (productos.length) {
     try {
       pedido = await api.post('/pedidos', {
@@ -17,7 +28,7 @@ export async function confirmarCompra(carritoItems, pago = {}) {
       }, { requiereSesion: true });
       confirmadas.push(...productos.map((p) => String(p.id)));
     } catch (error) {
-      if (error.status === 401) throw error;
+      if (error.status === 401 || (error.status === 409 && (error.detalles || []).some((d) => d.campo === 'items'))) throw error;
       errores.push({ tipo: 'pedido', mensaje: error.mensaje, detalles: error.detalles, error });
     }
   }
