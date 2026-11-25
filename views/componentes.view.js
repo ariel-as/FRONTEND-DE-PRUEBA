@@ -52,20 +52,67 @@ export function seccionCategoriaTienda({ categoria, productos }) {
     </section>`;
 }
 
-export function tarjetaPlan(plan) {
+function precioPlan(plan) {
+  return Number(plan?.precioConIva ?? plan?.precio ?? 0);
+}
+
+function duracionPlan(plan) {
+  if (plan.tipo === 'I') return { clave: 'ingresos', titulo: 'Planes por ingresos', detalle: 'Sin fecha de vencimiento' };
+  if (plan.unidadDuracion === 'D') return { clave: 'diario', titulo: 'Planes diarios', detalle: 'Acceso por un día' };
+  const meses = Number(plan.duracion) || 1;
+  if (meses === 1) return { clave: 'mensual', titulo: 'Planes mensuales', detalle: 'Acceso por un mes' };
+  if (meses === 3) return { clave: 'trimestral', titulo: 'Planes trimestrales', detalle: 'Acceso por tres meses' };
+  if (meses === 12) return { clave: 'anual', titulo: 'Planes anuales', detalle: 'Acceso por doce meses' };
+  return { clave: `duracion-${meses}`, titulo: `Planes de ${meses} meses`, detalle: `Acceso por ${meses} meses` };
+}
+
+function sufijoPrecio(plan) {
+  if (plan.tipo === 'I') return ` / ${plan.numIngresos} ingresos`;
+  if (plan.unidadDuracion === 'D') return ' / día';
+  return Number(plan.duracion) === 1 ? ' / mes' : ` / ${plan.duracion} meses`;
+}
+
+function ahorroPlan(plan, planes) {
+  const precio = precioPlan(plan);
+  if (plan.unidadDuracion === 'D' || plan.tipo === 'I') return null;
+  const base = planes.find((p) => p.id === 'MI1' || (p.tipo === 'T' && p.unidadDuracion === 'M' && Number(p.duracion) === 1 && Number(p.personas || 1) === 1));
+  if (!base) return null;
+  const meses = Number(plan.duracion) || 1;
+  const personas = Number(plan.personas || 1);
+  const ahorro = precioPlan(base) * meses * personas - precio;
+  if (ahorro <= 0) return null;
+  return { total: ahorro, texto: `Ahorras ${formatearPrecio(ahorro)} ${meses === 1 ? 'frente al plan individual' : 'frente a contratar mes a mes'}` };
+}
+
+export function agruparPlanes(planes) {
+  const grupos = new Map();
+  planes.forEach((plan) => {
+    const grupo = duracionPlan(plan);
+    if (!grupos.has(grupo.clave)) grupos.set(grupo.clave, { ...grupo, planes: [] });
+    grupos.get(grupo.clave).planes.push(plan);
+  });
+  return [...grupos.values()];
+}
+
+export function tarjetaPlan(plan, planes = []) {
   const beneficios = (plan.beneficios || []).map((b) => `
         <li class="flex items-start gap-2 text-sm text-neutral-300"><span aria-hidden="true" class="font-bold text-pf-amarillo">✓</span><span>${escapar(b)}</span></li>`).join('');
+  const precio = precioPlan(plan);
+  const ahorro = ahorroPlan(plan, planes);
+  const duracion = duracionPlan(plan);
   return `
-    <article class="pf-tarjeta h-full flex flex-col overflow-hidden" data-plan="${escapar(plan.id)}">
+    <article class="pf-tarjeta h-full flex flex-col overflow-hidden" data-plan="${escapar(plan.id)}" data-duracion="${escapar(duracion.clave)}"${ahorro?` data-ahorro="${escapar(ahorro.total.toFixed(2))}"`:''}>
       <img class="pf-imagen-tarjeta" src="${escapar(rutaArchivo(plan.imagen))}" alt="${escapar(plan.nombre)} de Planeta Fitness" loading="lazy" width="600" height="450">
       <div class="flex flex-col gap-4 p-6 flex-1">
         <h3 class="text-xl font-bold text-white">${escapar(plan.nombre)}</h3>
         <p class="text-sm text-neutral-300">${escapar(plan.descripcion || '')}</p>
-        <p class="text-3xl font-extrabold pf-precio">${formatearPrecio(plan.precio)} <span class="text-sm font-semibold text-neutral-300">/ mes</span></p>
-        <p class="text-xs text-neutral-400">IVA incluido</p>
+        <p class="pf-etiqueta self-start" data-duracion-plan>${escapar(duracion.detalle)}</p>
+        <p class="text-3xl font-extrabold pf-precio">${formatearPrecio(precio)} <span class="text-sm font-semibold text-neutral-300">${escapar(sufijoPrecio(plan))}</span></p>
+        <p class="text-xs text-neutral-400">IVA incluido${Number(plan.personas || 1) > 1 ? ` · ${plan.personas} personas` : ''}</p>
+        ${ahorro?`<p class="pf-etiqueta self-start" data-ahorro-plan>${escapar(ahorro.texto)}</p>`:''}
         <h4 class="text-sm font-bold uppercase tracking-wide text-pf-amarillo">Incluye</h4>
         <ul class="space-y-1 flex-1">${beneficios}</ul>
-        <button type="button" class="pf-boton pf-boton-primario w-full" data-accion="elegir-plan" data-plan-id="${escapar(plan.id)}" data-plan-nombre="${escapar(plan.nombre)}" data-plan-precio="${escapar(plan.precio)}" aria-label="Agregar ${escapar(plan.nombre)} al carrito, precio ${formatearPrecio(plan.precio)} al mes">Elegir plan</button>
+        <button type="button" class="pf-boton pf-boton-primario w-full" data-accion="elegir-plan" data-plan-id="${escapar(plan.id)}" data-plan-nombre="${escapar(plan.nombre)}" data-plan-precio="${escapar(precio)}" aria-label="Agregar ${escapar(plan.nombre)} al carrito, precio ${formatearPrecio(precio)}">Elegir plan</button>
       </div>
     </article>`;
 }

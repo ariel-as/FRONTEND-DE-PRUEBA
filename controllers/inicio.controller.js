@@ -1,6 +1,6 @@
 ﻿import { obtenerProductos, obtenerPlanes, obtenerClases, obtenerEntrenadores, obtenerGimnasio, enviarContacto } from '../models/catalogo.model.js';
 import { carrito } from '../models/carrito.model.js';
-import { escapar, mostrarAviso, renderizar, vacio, tarjetaProducto, tarjetaPlan, tarjetaClase, tarjetaEntrenador, tarjetaServicio, seccionCategoriaTienda } from '../views/componentes.view.js';
+import { escapar, mostrarAviso, renderizar, vacio, tarjetaProducto, tarjetaPlan, agruparPlanes, tarjetaClase, tarjetaEntrenador, tarjetaServicio, seccionCategoriaTienda } from '../views/componentes.view.js';
 import { construirValidador, mostrarMensaje, mostrarErroresServidor } from './validacion.controller.js';
 
 function select(s){ return document.querySelector(s); }
@@ -32,7 +32,7 @@ function iniciarEventosCatalogo() {
     if (!boton) return;
     const plan = planesActuales.find((p)=> String(p.id) === String(boton.dataset.planId));
     if (!plan) return;
-    carrito.agregar({ id: plan.id, nombre: plan.nombre, precio: plan.precio, imagen: plan.imagen, tipo: 'plan', membresiaId: plan.id }, 1);
+    carrito.agregar({ id: plan.id, nombre: plan.nombre, precio: plan.precioConIva ?? plan.precio, imagen: plan.imagen, tipo: 'plan', membresiaId: plan.id }, 1);
     mostrarAviso(`${plan.nombre} se agregó al carrito.`, 'exito');
   });
 }
@@ -113,7 +113,12 @@ function pintarPlanes(resultado){
   cont.setAttribute('aria-busy','false');
   if (resultado.origen === 'error') { mostrarErrorCatalogo(cont, resultado.mensaje); return; }
   if (!resultado.datos.length){ cont.innerHTML = vacio('No hay planes disponibles por ahora.'); return; }
-  renderizar(cont, resultado.datos.map(tarjetaPlan));
+  renderizar(cont, agruparPlanes(resultado.datos).map((grupo) => `
+    <section class="pf-tienda-categoria" aria-labelledby="planes-${escapar(grupo.clave)}">
+      <h3 id="planes-${escapar(grupo.clave)}" class="pf-tienda-titulo">${escapar(grupo.titulo)}</h3>
+      <p class="small text-body-secondary mb-2">${escapar(grupo.detalle)}</p>
+      <div class="pf-tienda-grid">${grupo.planes.map((plan) => tarjetaPlan(plan, resultado.datos)).join('')}</div>
+    </section>`));
 }
 function pintarClases(resultado, entrenadores){
   const cont = select('[data-clases]'); if(!cont) return;
