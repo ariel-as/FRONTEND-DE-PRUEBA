@@ -1,68 +1,131 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Productos | Administración Planeta Fitness</title>
-<link rel="icon" href="../assets/img/logo/logo-planeta.png" type="image/png"><script src="../assets/js/tema.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"><link rel="stylesheet" href="../assets/css/styles.css"></head>
-<body class="bg-body-tertiary pf-admin" data-pagina="productos-admin">
-<a class="pf-saltar" href="#contenido">Ir al contenido principal</a>
-<header class="bg-dark"><nav class="navbar navbar-expand-lg navbar-dark" aria-label="Navegación del dashboard"><div class="container-fluid">
-  <a class="navbar-brand d-flex align-items-center gap-2" href="index.html"><img src="../assets/img/logo/logo-planeta.png" alt="Planeta Fitness" width="48" height="44" class="pf-admin-logo"><span>Administrador</span></a>
-  <button class="navbar-toggler" type="button" aria-label="Mostrar el menú de administración" aria-controls="menu-admin" aria-expanded="false" data-bs-toggle="collapse" data-bs-target="#menu-admin"><span class="navbar-toggler-icon"></span></button>
-  <div class="collapse navbar-collapse" id="menu-admin"><ul class="navbar-nav me-auto mb-2 mb-lg-0">
-    <li class="nav-item"><a class="nav-link" href="index.html">Dashboard</a></li><li class="nav-item"><a class="nav-link active" aria-current="page" href="productos.html">Productos</a></li><li class="nav-item"><a class="nav-link" href="pedidos.html">Pedidos</a></li><li class="nav-item"><a class="nav-link" href="clientes.html">Clientes</a></li><li class="nav-item"><a class="nav-link" href="membresias.html">Membresías</a></li><li class="nav-item"><a class="nav-link" href="inscripciones.html">Inscripciones</a></li><li class="nav-item"><a class="nav-link" href="clases.html">Clases</a></li><li class="nav-item"><a class="nav-link" href="personal.html">Personal</a></li><li class="nav-item" data-solo-adm><a class="nav-link" href="usuarios.html">Usuarios</a></li><li class="nav-item"><a class="nav-link" href="tablas.html">Otras tablas</a></li>
-  </ul><div class="dropdown ms-lg-2">
-      <button type="button" class="pf-admin-usuario btn btn-outline-light btn-sm rounded-circle d-inline-flex align-items-center justify-content-center p-0" id="menu-usuario-admin" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Opciones de usuario">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0-2.2-2.7-4-6-4s-6 1.8-6 4v1h12v-1ZM3.1 12c.4-1.4 2.3-2.5 4.9-2.5s4.5 1.1 4.9 2.5H3.1Z"/></svg>
-      </button>
-      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menu-usuario-admin">
-        <li><p class="dropdown-header mb-0"><span data-admin-tipo class="fw-bold text-white">Administrador general</span></p></li>
-        <li><a class="dropdown-item" href="../index.html">Ver sitio</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><button type="button" class="dropdown-item" data-cerrar-sesion>Cerrar sesión</button></li>
-      </ul>
-    </div></div>
-  <button type="button" class="btn btn-outline-light btn-sm pf-boton-tema ms-2" data-boton-tema aria-label="Cambiar el modo de color"><span aria-hidden="true" data-icono-tema>☾</span></button>
-</div></nav></header>
-<main id="contenido" class="container py-4">
-  <div class="d-flex flex-wrap gap-2 align-items-center"><h1 class="h3 mb-0 me-auto">Productos</h1><button type="button" class="btn btn-primary" data-nuevo-producto>Nuevo producto</button></div>
-  <p id="mensaje-productos" class="pf-mensaje mt-2" role="status" aria-live="polite" hidden></p>
-  <div class="row g-4 mt-1">
-    <section class="col-12 col-xl-4"><div class="card shadow-sm"><div class="card-body"><h2 id="titulo-form" class="h5">Agregar producto</h2><p class="small text-body-secondary">Los campos con * son obligatorios.</p>
-      <form id="formulario-producto" data-modo="crear" class="row g-2">
-        <div class="col-12"><label class="form-label" for="id">Código</label><input class="form-control" id="id" name="id" maxlength="13"></div>
-        <div class="col-12"><label class="form-label" for="nombre">Nombre *</label><input class="form-control" id="nombre" name="nombre" required maxlength="100"></div>
-        <div class="col-12"><label class="form-label" for="categoriaId">Categoría *</label><select class="form-select" id="categoriaId" name="categoriaId" required></select></div>
-        <div class="col-6"><label class="form-label" for="unidadMedidaId">Unidad</label><select class="form-select" id="unidadMedidaId" name="unidadMedidaId"><option value="UND">Unidad</option></select></div>
-        <div class="col-6"><label class="form-label" for="contenido-cantidad">Contenido</label><input class="form-control" id="contenido-cantidad" name="contenido" type="number" step="0.01"></div>
-        <div class="col-6"><label class="form-label" for="talla">Talla</label><input class="form-control" id="talla" name="talla" maxlength="4"></div>
-        <div class="col-6"><label class="form-label" for="precio">Precio sin IVA *</label><input class="form-control" id="precio" name="precio" type="number" step="0.01" min="0.01" required></div>
-        <div class="col-6 form-check mt-4 ms-2"><input class="form-check-input" type="checkbox" id="pagaIva" name="pagaIva" checked><label class="form-check-label" for="pagaIva">Grava IVA</label></div>
-        <div class="col-6 form-check mt-4"><input class="form-check-input" type="checkbox" id="publicarWeb" name="publicarWeb" checked><label class="form-check-label" for="publicarWeb">Vender en web</label></div>
-        <div class="col-6"><label class="form-label" for="stock">Stock</label><input class="form-control" id="stock" name="stock" type="number" step="1" min="0"></div>
-        <div class="col-6"><label class="form-label" for="stockMin">Stock mínimo</label><input class="form-control" id="stockMin" name="stockMin" type="number" step="1" min="0"></div>
-        <div class="col-6"><label class="form-label" for="costoUnit">Costo unitario</label><input class="form-control" id="costoUnit" name="costoUnit" type="number" step="0.01"></div>
-        <div class="col-6"><label class="form-label" for="motivoAjuste">Motivo ajuste</label><input class="form-control" id="motivoAjuste" name="motivoAjuste" maxlength="200"></div>
-        <div class="col-6 form-check mt-2 ms-2"><input class="form-check-input" type="checkbox" id="controlaCaducidad" name="controlaCaducidad"><label class="form-check-label" for="controlaCaducidad">Caduca</label></div>
-        <div class="col-6" data-campo-caducidad hidden><label class="form-label" for="diasAlertaCad">Días alerta</label><input class="form-control" id="diasAlertaCad" name="diasAlertaCad" type="number" min="1" max="365"></div>
-        <div class="col-6" data-campo-caducidad hidden><label class="form-label" for="fechaCaducidad">Caducidad lote</label><input class="form-control" id="fechaCaducidad" name="fechaCaducidad" type="date"></div>
-        <div class="col-6"><label class="form-label" for="estado">Estado</label><select class="form-select" id="estado" name="estado"><option value="A">A la venta</option><option value="P">Pendiente</option><option value="I">Inactivo</option></select></div>
-        <div class="col-12"><label class="form-label" for="descripcion">Descripción</label><textarea class="form-control" id="descripcion" name="descripcion" rows="2" maxlength="300"></textarea></div>
-        <div class="col-12"><button type="submit" class="btn btn-primary w-100">Guardar</button></div>
-      </form>
-    </div></div></section>
-    <section class="col-12 col-xl-8"><div class="card shadow-sm"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-2"><h2 class="h5 mb-0">Listado</h2><select id="filtro-estado" class="form-select w-auto" aria-label="Filtrar por estado"><option value="">Todos</option><option value="A">A la venta</option><option value="P">Pendiente</option><option value="I">Inactivo</option></select></div>
-      <div class="table-responsive"><table class="table table-hover align-middle"><caption class="visually-hidden">Productos</caption><thead class="table-light"><tr><th scope="col">Producto</th><th scope="col">Categoría</th><th scope="col">Precio sin IVA</th><th scope="col">Con IVA</th><th scope="col">Stock</th><th scope="col">Estado</th><th scope="col">Web</th><th scope="col">Acciones</th></tr></thead><tbody data-tabla-productos></tbody></table></div>
-      <div data-paginacion-productos></div>
-    </div></div></section>
-  </div>
-</main>
-<footer class="border-top py-4 mt-5"><p class="container text-center text-body-secondary mb-0">© <span data-anio>2026</span> Planeta Fitness</p></footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script type="module" src="../controllers/admin.controller.js"></script>
-<script type="module" src="../controllers/admin-productos.controller.js"></script>
-  <aside class="pf-aviso pf-foco-claro border border-pf-linea p-4 text-sm text-white" data-aviso-cookies aria-label="Aviso de cookies" hidden>
-    <p>Este sitio utiliza cookies para mejorar tu experiencia.</p>
-    <button type="button" class="btn btn-warning btn-sm mt-2" data-aceptar-cookies>Entendido</button>
-  </aside>
-  <div class="pf-aviso pf-mensaje" data-aviso role="status" aria-live="polite" hidden></div>
-</body></html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Productos e inventario · Planeta Fitness</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body class="pf-fondo">
+  <header class="pf-cabecera container-fluid py-3 px-4">
+    <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between">
+      <a class="pf-marca h4 mb-0" href="../index.html">Planeta Fitness</a>
+      <nav aria-label="Navegación de administración" class="d-flex flex-wrap gap-3">
+        <a class="pf-enlace" href="index.html">Inicio</a>
+        <a class="pf-enlace" href="productos.html#inventario">Inventario</a>
+        <a class="pf-enlace" href="clientes.html">Clientes</a>
+        <a class="pf-enlace" href="membresias.html">Membresías</a>
+        <a class="pf-enlace" href="configuracion.html">Configuración</a>
+        <button type="button" class="pf-boton" data-cerrar-sesion>Cerrar sesión</button>
+      </nav>
+    </div>
+  </header>
+  <main class="container py-5" data-panel-admin>
+    <h1 class="pf-titulo h2 mb-4" id="inventario">Productos e inventario</h1>
+
+    <div class="pf-card p-3 mb-4" role="tablist" aria-label="Secciones de inventario">
+      <div class="d-flex flex-wrap gap-2">
+        <button type="button" class="pf-boton" role="tab" id="tab-productos" aria-controls="pestana-productos" aria-selected="true" data-pestana="productos">Productos</button>
+        <button type="button" class="pf-boton" role="tab" id="tab-lotes" aria-controls="pestana-lotes" aria-selected="false" tabindex="-1" data-pestana="lotes">Lotes</button>
+        <button type="button" class="pf-boton" role="tab" id="tab-alertas" aria-controls="pestana-alertas" aria-selected="false" tabindex="-1" data-pestana="alertas">Alertas</button>
+        <button type="button" class="pf-boton" role="tab" id="tab-ayuda" aria-controls="pestana-ayuda" aria-selected="false" tabindex="-1" data-pestana="ayuda">Ayuda</button>
+      </div>
+    </div>
+
+    <section id="pestana-productos" role="tabpanel" aria-labelledby="tab-productos" data-panel-pestana="productos">
+      <div class="pf-card p-4 mb-4">
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+          <h2 class="h5 mb-0">Registrar producto</h2>
+          <button type="button" class="pf-boton" data-nuevo-producto>Nuevo producto</button>
+        </div>
+        <form class="row g-3" data-form-producto novalidate>
+          <div class="col-12 col-md-6"><label class="form-label" for="producto-nombre">Nombre</label><input class="form-control pf-campo" id="producto-nombre" name="nombre" required maxlength="120"></div>
+          <div class="col-12 col-md-3"><label class="form-label" for="producto-id">Código</label><input class="form-control pf-campo" id="producto-id" name="id" required maxlength="13"></div>
+          <div class="col-12 col-md-3"><label class="form-label" for="producto-categoria">Categoría</label><select class="form-select pf-campo" id="producto-categoria" name="categoriaId" data-categorias required></select></div>
+          <div class="col-12 col-md-3"><label class="form-label" for="producto-precio">Precio</label><input class="form-control pf-campo" id="producto-precio" name="precio" type="number" min="0" step="0.01" required></div>
+          <div class="col-12 col-md-3"><label class="form-label" for="producto-stock">Stock</label><input class="form-control pf-campo" id="producto-stock" name="stock" type="number" min="0" step="1" required></div>
+          <div class="col-12 col-md-3"><label class="form-label" for="producto-stock-min">Stock mínimo</label><input class="form-control pf-campo" id="producto-stock-min" name="stockMin" type="number" min="0" step="1"></div>
+          <div class="col-12 col-md-3"><label class="form-label" for="producto-unidad">Unidad</label><select class="form-select pf-campo" id="producto-unidad" name="unidadMedidaId"><option value="UND">Unidad</option><option value="BOT">Botella</option><option value="CAJ">Caja</option></select></div>
+          <div class="col-12"><label class="form-label" for="producto-descripcion">Descripción</label><textarea class="form-control pf-campo" id="producto-descripcion" name="descripcion" rows="2" maxlength="250"></textarea></div>
+          <div class="col-12 col-md-6"><label class="form-check"><input class="form-check-input" type="checkbox" name="controlaCaducidad" data-campo-caducidad> <span class="form-check-label">Controla caducidad (FEFO)</span></label></div>
+          <div class="col-12 col-md-6" data-campo-caducidad hidden><label class="form-label" for="producto-dias-alerta">Días de alerta</label><input class="form-control pf-campo" id="producto-dias-alerta" name="diasAlertaCad" type="number" min="1" max="365" value="30"></div>
+          <div class="col-12"><button class="pf-boton" type="submit">Guardar producto</button></div>
+        </form>
+      </div>
+
+      <div class="pf-card p-4">
+        <h2 class="h5 mb-3">Productos registrados</h2>
+        <div class="table-responsive">
+          <table class="table pf-tabla align-middle" data-tabla-productos>
+            <thead><tr><th scope="col">Producto</th><th scope="col">Categoría</th><th scope="col">Precio</th><th scope="col">Precio con IVA</th><th scope="col">Stock</th><th scope="col">Estado</th><th scope="col">Web</th><th scope="col">Acciones</th></tr></thead>
+            <tbody data-filas-productos></tbody>
+          </table>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-3" data-paginacion-productos></div>
+      </div>
+    </section>
+
+    <section id="pestana-lotes" role="tabpanel" aria-labelledby="tab-lotes" data-panel-pestana="lotes" hidden>
+      <div class="pf-card p-4 mb-4">
+        <h2 class="h5 mb-3">Filtros de lotes</h2>
+        <div class="row g-3">
+          <div class="col-12 col-md-3"><label class="form-label" for="filtro-tipo-inventario">Tipo de inventario</label><select class="form-select pf-campo" id="filtro-tipo-inventario"><option value="">Todos</option><option value="FEFO">Con caducidad (FEFO)</option><option value="FIFO">Sin caducidad (FIFO)</option></select></div>
+          <div class="col-12 col-md-3"><label class="form-label" for="filtro-producto">Producto</label><input class="form-control pf-campo" id="filtro-producto" list="lista-productos" placeholder="Código del producto"><datalist id="lista-productos" data-lista-productos></datalist></div>
+          <div class="col-12 col-md-3"><label class="form-label" for="filtro-categoria">Categoría</label><select class="form-select pf-campo" id="filtro-categoria" data-filtro-categoria><option value="">Todas</option></select></div>
+          <div class="col-12 col-md-3"><label class="form-label" for="filtro-estado-lote">Estado</label><select class="form-select pf-campo" id="filtro-estado-lote"><option value="">Todos</option><option value="D">Disponible</option><option value="A">Agotado</option><option value="C">Caducado</option><option value="B">Bloqueado</option></select></div>
+          <div class="col-12 col-md-3" data-rango-caducidad hidden><label class="form-label" for="filtro-caduca-desde">Caduca desde</label><input class="form-control pf-campo" id="filtro-caduca-desde" type="date"></div>
+          <div class="col-12 col-md-3" data-rango-caducidad hidden><label class="form-label" for="filtro-caduca-hasta">Caduca hasta</label><input class="form-control pf-campo" id="filtro-caduca-hasta" type="date"></div>
+          <div class="col-12 col-md-3"><label class="form-check"><input class="form-check-input" id="filtro-por-caducar" type="checkbox"> <span class="form-check-label">Solo por caducar</span></label></div>
+          <div class="col-12 col-md-3"><label class="form-check"><input class="form-check-input" id="filtro-solo-stock" type="checkbox"> <span class="form-check-label">Solo con stock</span></label></div>
+        </div>
+      </div>
+      <div class="pf-card p-4">
+        <h2 class="h5 mb-3">Lotes</h2>
+        <div class="table-responsive">
+          <table class="table pf-tabla align-middle">
+            <thead><tr><th scope="col">Producto</th><th scope="col">Tipo de salida</th><th scope="col">Situación</th><th scope="col">Caducidad</th><th scope="col">Disponibles</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead>
+            <tbody data-tabla-lotes><tr><td colspan="7">Cargando lotes…</td></tr></tbody>
+          </table>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mt-3" data-paginacion-lotes></div>
+      </div>
+    </section>
+
+    <section id="pestana-alertas" role="tabpanel" aria-labelledby="tab-alertas" data-panel-pestana="alertas" hidden>
+      <div class="row g-3">
+        <div class="col-12 col-xl-4"><div class="pf-card p-4 h-100"><h2 class="h5">Lotes por caducar</h2><div data-lista-por-caducar></div></div></div>
+        <div class="col-12 col-xl-4"><div class="pf-card p-4 h-100"><h2 class="h5">Caducados con unidades</h2><div data-lista-caducados></div></div></div>
+        <div class="col-12 col-xl-4"><div class="pf-card p-4 h-100"><h2 class="h5">Sin stock o bajo mínimo</h2><div data-lista-sin-stock></div></div></div>
+      </div>
+    </section>
+
+    <section id="pestana-ayuda" role="tabpanel" aria-labelledby="tab-ayuda" data-panel-pestana="ayuda" hidden>
+      <div class="pf-card p-4">
+        <h2 class="h5 mb-3">Ayuda de inventario</h2>
+        <ul class="mb-0">
+          <li><strong>FEFO:</strong> sale primero lo que caduca antes; usa el rango de caducidad para revisar esos lotes.</li>
+          <li><strong>FIFO:</strong> sale primero lo que entró antes; no tiene fecha de caducidad.</li>
+          <li><strong>Solo por caducar:</strong> muestra lotes próximos a vencer dentro del periodo de alerta.</li>
+          <li><strong>Solo con stock:</strong> oculta lotes agotados o caducados sin unidades disponibles.</li>
+          <li>La baja y el bloqueo se registran en el kárdex; siempre se pide una observación para la baja.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="pf-card p-4" id="dialogo-kardex" aria-labelledby="titulo-kardex">
+    <h2 class="h5" id="titulo-kardex">Kárdex del producto</h2>
+    <div data-contenido-kardex></div>
+    <form method="dialog"><button class="pf-boton mt-3" value="close">Cerrar</button></form>
+  </dialog>
+
+  <footer class="container py-4 text-body-secondary small">
+    <p class="mb-0">© <span data-anio></span> Planeta Fitness.</p>
+  </footer>
+  <script type="module" src="../controllers/admin.controller.js"></script>
+  <script type="module" src="../controllers/admin-productos.controller.js"></script>
+  <script type="module" src="../controllers/admin-inventario.controller.js"></script>
+</body>
+</html>

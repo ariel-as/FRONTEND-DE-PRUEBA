@@ -1,104 +1,75 @@
-import { iniciarTema } from './comunes.controller.js';
-import { usuarioActual, codigosRol, esAdministrador, iniciarSesion, cerrarSesion } from '../models/sesion.model.js';
 import { adminModel } from '../models/admin.model.js';
-import { CLAVES, leerCookie, escribirCookie } from '../models/storage.model.js';
-import { construirValidador, mostrarMensaje } from './validacion.controller.js';
-import { escapar, mostrarAviso } from '../views/componentes.view.js';
-import { formatearPrecio } from '../models/carrito.model.js';
+import { usuarioActual, cerrarSesion } from '../models/sesion.model.js';
+import { mostrarAviso } from '../views/componentes.view.js';
 
-function select(s){ return document.querySelector(s); }
-function selectAll(s){ return [...document.querySelectorAll(s)]; }
+const select = (selector, raiz = document) => raiz.querySelector(selector);
+const selectAll = (selector, raiz = document) => [...raiz.querySelectorAll(selector)];
+const numero = (valor) => new Intl.NumberFormat('es-EC').format(Number(valor) || 0);
+const textoEstado = { P: 'Pendiente', A: 'A la venta', I: 'Inactivo', C: 'Cancelado' };
 
-export function protegerAdmin() {
-  const pagina = document.body.dataset.pagina;
-  if (pagina === 'login-admin') return true;
-  if (!esAdministrador()) { window.location.replace(new URL('login.html', document.baseURI).href); return false; }
-  return true;
+function esAdministrador() {
+  const usuario = usuarioActual();
+  return Boolean(usuario && (usuario.rol === 'ADM' || usuario.rol === 'admin' || usuario.esAdmin === true));
 }
 
-export function iniciarSesionAdminUI(){
-  const u = usuarioActual();
-  const codigos = codigosRol(u);
-  const rolAdm = codigos.includes('ADM') || (!codigos.length && u?.rol === 'admin');
-  const TIPOS = { ADM: 'Administrador general', REC: 'Recepcionista', ENT: 'Entrenador', CON: 'Contador' };
-  const tipo = codigos.map((c)=>TIPOS[c]).find(Boolean) || (u?.rol === 'admin' ? 'Administrador general' : 'Administrador');
-  selectAll('[data-admin-tipo]').forEach(n=> { n.textContent = tipo; });
-  document.querySelector('.pf-admin-usuario')?.setAttribute('aria-label', `Opciones de ${tipo}`);
-  selectAll('[data-solo-adm]').forEach(n=> { n.hidden = !rolAdm; });
-  if (!rolAdm && document.body.dataset.pagina === 'usuarios-admin') {
-    window.location.replace(new URL('index.html', document.baseURI).href);
-  }
-  selectAll('[data-cerrar-sesion]').forEach(b=> b.addEventListener('click', ()=>{ cerrarSesion(); window.location.replace(new URL('login.html', document.baseURI).href); }));
-}
-
-function inyectarAvisosAdmin(){
-  if (!document.querySelector('[data-aviso-cookies]')) {
-    document.body.insertAdjacentHTML('beforeend', `<aside class="pf-aviso pf-foco-claro border border-pf-linea p-4 text-sm text-white" data-aviso-cookies aria-label="Aviso de cookies" hidden><p class="mb-2">Este sitio utiliza cookies para mejorar tu experiencia.</p><button type="button" class="btn btn-warning btn-sm" data-aceptar-cookies>Entendido</button></aside><div class="pf-aviso pf-mensaje" data-aviso role="status" aria-live="polite" hidden></div>`);
-  }
-  const aviso = document.querySelector('[data-aviso-cookies]');
-  if (aviso && !leerCookie(CLAVES.cookieAviso)) aviso.hidden = false;
-  document.querySelector('[data-aceptar-cookies]')?.addEventListener('click', () => {
-    escribirCookie(CLAVES.cookieAviso, '1', 365);
-    if (aviso) aviso.hidden = true;
-    mostrarAviso('Preferencia guardada.', 'exito');
-  });
-}
-
-export function iniciarLoginAdmin(){
-  if (esAdministrador()) { window.location.replace(new URL('index.html', document.baseURI).href); return; }
-  const form = select('#formulario-login-admin'); if(!form) return;
-  const region = select('#mensaje-login-admin');
-  const boton = form.querySelector('[type="submit"]');
-  construirValidador(form, {
-    alEnviar: async () => {
-      if (boton) boton.disabled = true;
-      try {
-        const res = await iniciarSesion(form.querySelector('#correo').value.trim(), form.querySelector('#contrasena').value, 'admin');
-        if (!res.ok) { mostrarMensaje(region, res.mensaje || 'No se pudo iniciar sesión.', 'error'); return false; }
-        mostrarMensaje(region, 'Sesión iniciada.', 'exito');
-        window.setTimeout(()=> window.location.href = new URL('index.html', document.baseURI).href, 500);
-        return true;
-      } finally {
-        if (boton) boton.disabled = false;
-      }
-    }
-  });
-}
-
-export async function iniciarDashboard(){
+async function cargarResumen() {
   try {
-    const [resumen, pedidos] = await Promise.all([adminModel.resumen(), adminModel.pedidos({limit:5})]);
-    const map = {
+    const resumen = await adminModel.resumen();
+    const valores = {
       '[data-total-productos]': resumen.productosActivos ?? resumen.productos ?? 0,
       '[data-total-bajo-stock]': resumen.bajoStock ?? 0,
       '[data-total-pedidos]': resumen.pedidosPendientes ?? resumen.pedidos ?? 0,
       '[data-total-clientes]': resumen.clientesActivos ?? resumen.clientes ?? 0,
       '[data-total-inscripciones]': resumen.inscripcionesPendientes ?? resumen.inscripciones ?? 0,
-      '[data-total-mensajes]': resumen.mensajesPendientes ?? 0
+      '[data-total-mensajes]': resumen.mensajesPendientes ?? 0,
+      '[data-total-facturas]': resumen.facturasPendientes ?? 0,
+      '[data-total-mis-rutinas]': resumen.misRutinas ?? 0,
+      '[data-total-lotes-por-caducar]': resumen.lotesPorCaducar ?? 0,
+      '[data-total-lotes-caducados]': resumen.lotesCaducados ?? 0,
+      '[data-total-sin-stock]': resumen.productosSinStock ?? 0
     };
-    Object.entries(map).forEach(([sel,val])=>{ const n=select(sel); if(n) n.textContent = val; });
-    const tbody = select('[data-tabla-pedidos-recientes]');
-    const lista = pedidos?.data || pedidos?.pedidos || pedidos || [];
-    if (tbody) tbody.innerHTML = lista.length ? lista.map(p=>`<tr><th scope="row">${escapar(p.id)}</th><td>${escapar(p.usuario?.login||p.userId||'')}</td><td>${escapar(new Date(p.createdAt||Date.now()).toLocaleDateString('es-EC'))}</td><td>${escapar(p.estadoNombre||p.estado||'')}</td><td>${formatearPrecio(p.total)}</td><td><a class="btn btn-sm btn-outline-primary" href="pedidos.html">Ver</a></td></tr>`).join('') : '<tr><td colspan="6" class="text-center text-body-secondary">No hay pedidos recientes.</td></tr>';
-  } catch(e){ mostrarMensaje(select('#mensaje-admin'), e.mensaje || 'No se pudo cargar el dashboard.', 'error'); }
+    Object.entries(valores).forEach(([selector, valor]) => {
+      const nodo = select(selector);
+      if (nodo) nodo.textContent = numero(valor);
+    });
+    const aviso = select('[data-alerta-inventario]');
+    if (aviso) {
+      const porCaducar = Number(resumen.lotesPorCaducar) || 0;
+      const caducados = Number(resumen.lotesCaducados) || 0;
+      aviso.hidden = !(porCaducar || caducados);
+      aviso.textContent = `${porCaducar} lote${porCaducar === 1 ? '' : 's'} caduca${porCaducar === 1 ? '' : 'n'} esta semana · ${caducados} lote${caducados === 1 ? '' : 's'} caducado${caducados === 1 ? '' : 's'} con unidades`;
+    }
+  } catch (error) {
+    mostrarAviso(error.mensaje || 'No se pudo cargar el resumen.', 'error');
+  }
 }
 
-export function estadoTexto(valor, mapa){
-  return mapa?.[valor] || valor || 'vacío';
+async function cargarPedidos() {
+  const tbody = select('[data-tabla-pedidos-recientes]');
+  if (!tbody) return;
+  try {
+    const pedidos = await adminModel.pedidos({ page: 1, limit: 5 });
+    const filas = pedidos.data || pedidos;
+    tbody.innerHTML = filas.length
+      ? filas.map((p) => `<tr><th scope="row">#${p.id}</th><td>${p.cliente || 'Cliente'}</td><td>${numero(p.total)}</td><td>${textoEstado[p.estado] || p.estado || ''}</td></tr>`).join('')
+      : '<tr><td colspan="4">No hay pedidos recientes.</td></tr>';
+  } catch (error) {
+    tbody.innerHTML = '<tr><td colspan="4">No se pudieron cargar los pedidos.</td></tr>';
+  }
 }
 
-window.addEventListener('pf:sesion-expirada', ()=>{ window.location.href = new URL('login.html', document.baseURI).href; });
-
-export async function mainAdmin(){
-  iniciarTema();
-  const pagina = document.body.dataset.pagina;
-  if (pagina === 'login-admin'){ inyectarAvisosAdmin(); iniciarLoginAdmin(); return; }
-  if (!protegerAdmin()) return;
-  iniciarSesionAdminUI();
-  inyectarAvisosAdmin();
+export async function iniciarPanelAdmin() {
+  if (!select('[data-panel-admin]')) return;
+  if (!esAdministrador()) {
+    window.location.replace(new URL('login.html', document.baseURI).href);
+    return;
+  }
+  selectAll('[data-admin-tipo]').forEach((nodo) => { nodo.textContent = 'Administración'; });
+  selectAll('[data-solo-adm]').forEach((nodo) => { nodo.hidden = false; });
+  selectAll('[data-cerrar-sesion]').forEach((boton) => boton.addEventListener('click', () => {
+    cerrarSesion();
+    window.location.replace(new URL('login.html', document.baseURI).href);
+  }));
   selectAll('[data-anio]').forEach((nodo) => { nodo.textContent = new Date().getFullYear(); });
-  if (pagina === 'dashboard') await iniciarDashboard();
-  // pantallas específicas se auto-inician por su propio módulo importado en HTML
+  await Promise.all([cargarResumen(), cargarPedidos()]);
 }
-
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mainAdmin); else mainAdmin();
