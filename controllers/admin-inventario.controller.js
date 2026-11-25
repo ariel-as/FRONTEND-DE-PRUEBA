@@ -1,5 +1,5 @@
 import { adminModel } from '../models/admin.model.js';
-import { usuarioActual } from '../models/sesion.model.js';
+import { esAdministrador } from '../models/sesion.model.js';
 import { escapar, mostrarAviso, vacio } from '../views/componentes.view.js';
 import { paginacionAdmin } from '../views/admin.view.js';
 
@@ -18,8 +18,7 @@ let lotesCargados = false;
 let alertasCargadas = false;
 
 function puedeGestionar() {
-  const usuario = usuarioActual();
-  return Boolean(usuario && (usuario.rol === 'ADM' || usuario.rol === 'admin'));
+  return esAdministrador();
 }
 
 function diasParaCaducar(lote) {
@@ -253,7 +252,7 @@ async function alHacerClic(evento) {
 }
 
 export async function iniciarInventarioAdmin() {
-  if (!s('[data-panel-admin]') || !s('[data-tabla-lotes]') || !puedeGestionar()) return;
+  if (document.body.dataset.pagina !== 'productos-admin' || !s('[data-tabla-lotes]') || !puedeGestionar()) return;
   ss('[data-anio]').forEach((nodo) => { nodo.textContent = new Date().getFullYear(); });
   document.addEventListener('click', alHacerClic);
   ['#filtro-tipo-inventario', '#filtro-producto', '[data-filtro-categoria]', '#filtro-estado-lote', '#filtro-caduca-desde', '#filtro-caduca-hasta', '#filtro-por-caducar', '#filtro-solo-stock'].forEach((selector) => {
@@ -267,3 +266,5 @@ export async function iniciarInventarioAdmin() {
   await cargarCatalogos();
   aplicarFiltroDeEnlace();
 }
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciarInventarioAdmin); else iniciarInventarioAdmin();
