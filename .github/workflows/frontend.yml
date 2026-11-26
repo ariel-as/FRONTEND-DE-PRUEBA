@@ -1,4 +1,4 @@
-﻿name: CI/CD frontend
+name: CI/CD frontend
 
 on:
   pull_request:
@@ -90,7 +90,7 @@ jobs:
           test -s dist/index.html
           echo "Archivos preparados: $(find dist -type f | wc -l)"
       - name: Subir artefacto de Pages
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: dist
       - name: Desplegar sitio
