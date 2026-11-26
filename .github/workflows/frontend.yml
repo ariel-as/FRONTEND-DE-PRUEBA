@@ -1,4 +1,4 @@
-﻿name: CI/CD frontend
+name: CI/CD frontend
 
 on:
   pull_request:
@@ -95,4 +95,4 @@ jobs:
           path: dist
       - name: Desplegar sitio
         id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
